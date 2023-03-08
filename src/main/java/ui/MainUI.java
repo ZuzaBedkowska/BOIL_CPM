@@ -2,6 +2,10 @@ package ui;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 
 class DataFetcher extends AbstractTableModel {
@@ -46,10 +50,11 @@ public class MainUI {
     private JButton addButton;
     private JButton editButton;
     private JButton removeButton;
-    private DataFetcher dataFetcher;
+    private final DataFetcher dataFetcher;
     public MainUI() {
         editButton.setEnabled(false);
         removeButton.setEnabled(false);
+        createAddButton();
         dataFetcher = new DataFetcher();
         showEmpty();
     }
@@ -60,4 +65,35 @@ public class MainUI {
         showTable.setModel(dataFetcher);
     }
 
+    public void addRecord(){
+        try{
+            JTextField czynnosc = new JTextField("");
+            JTextField poprzednik = new JTextField("");
+            JTextField czas = new JTextField("");
+            JPanel panel = new JPanel(new GridLayout(0, 1));
+            panel.add(new JLabel("Czynność:"));
+            panel.add(czynnosc);
+            panel.add(new JLabel("Poprzednik:"));
+            panel.add(poprzednik);
+            panel.add(new JLabel("Czas trwania:"));
+            panel.add(czas);
+            JOptionPane.showConfirmDialog(null, panel, "Dodawanie rekordu", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        } catch (Exception e) {
+            String message = "Coś poszło nie tak!\n";
+            if (e.getMessage() != null) {
+                message += e.getMessage();
+                message += "\n";
+            }
+            message += "Spróbuj ponownie!\n";
+            JOptionPane.showMessageDialog(new JFrame(), message);
+        }
+    }
+    public void createAddButton() {
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addRecord();
+            }
+        });
+    }
 }
