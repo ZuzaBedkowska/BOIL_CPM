@@ -3,9 +3,6 @@ package ui;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 
 class DataFetcher extends AbstractTableModel {
@@ -32,11 +29,6 @@ class DataFetcher extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         return null;
     }
-
-    public String[] getColumnNames() {
-        return columnNames;
-    }
-
     public String getColumnName(int col) {
         return columnNames[col];
     }
@@ -64,7 +56,6 @@ public class MainUI {
     public void showEmpty() {
         showTable.setModel(dataFetcher);
     }
-
     public void addRecord(){
         try{
             JTextField czynnosc = new JTextField("");
@@ -89,11 +80,6 @@ public class MainUI {
         }
     }
     public void createAddButton() {
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addRecord();
-            }
-        });
+        addButton.addActionListener(e -> addRecord());
     }
 }
