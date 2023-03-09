@@ -32,6 +32,11 @@ class DataFetcher extends AbstractTableModel {
     public void addData(Object[] dane) {
         userData.add(dane);
     }
+    public void editData(int row, Object[] dane) {
+        userData.get(row)[0] = dane[0];
+        userData.get(row)[1] = dane[1];
+        userData.get(row)[2] = dane[2];
+    }
 }
 
 public class MainUI {
@@ -51,6 +56,7 @@ public class MainUI {
         createRemoveButton();
         createDisplayButton();
         createDisplayBox();
+        createSelectableRecord();
         dataFetcher = new DataFetcher();
         showData();
     }
@@ -76,7 +82,13 @@ public class MainUI {
     public void editRecord(){
         try{
             JPanel panel = new JPanel(new GridLayout(0, 1));
-            recordWindow(panel, new Object[]{"","",""}, "Edytowanie rekordu");
+            String czyn = (String) showTable.getValueAt(showTable.getSelectedRow(), 0);
+            String pop = (String) showTable.getValueAt(showTable.getSelectedRow(), 1);
+            String czas = ((String) showTable.getValueAt(showTable.getSelectedRow(), 2));
+            Object[] dane = new Object[]{czyn,pop,czas};
+            recordWindow(panel, dane, "Edytowanie rekordu");
+            dataFetcher.editData(showTable.getSelectedRow(), dane);
+            showData();
         } catch (Exception e) {
             errorWindow(e);
         }
@@ -109,8 +121,15 @@ public class MainUI {
     }
     public void createDisplayBox(){
         displayBox.setModel(new DefaultComboBoxModel<>(new String[]{"Tabela", "Diagram Gantta", "Graf CPM"}));
+    }
+    public void createSelectableRecord(){
+        showTable.setRowSelectionAllowed(true);
+        showTable.getSelectionModel().addListSelectionListener(e -> {
+            editButton.setEnabled(showTable.getSelectedRow()!=-1);
+            removeButton.setEnabled(showTable.getSelectedRow()!=-1);
+        });
 
-    };
+    }
     public void errorWindow(Exception e) {
         String message = "Coś poszło nie tak!\n";
         if (e.getMessage() != null) {
