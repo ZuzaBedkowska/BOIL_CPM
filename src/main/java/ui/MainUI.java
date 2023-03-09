@@ -37,6 +37,10 @@ class DataFetcher extends AbstractTableModel {
         userData.get(row)[1] = dane[1];
         userData.get(row)[2] = dane[2];
     }
+
+    public void removeData(int row) {
+        userData.remove(userData.get(row));
+    }
 }
 
 public class MainUI {
@@ -93,16 +97,17 @@ public class MainUI {
             errorWindow(e);
         }
     }
-    public void displayResult(String resultType) {
+    public void removeRecord() {
         try {
-            JOptionPane.showConfirmDialog(null, new JPanel(), resultType, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            dataFetcher.removeData(showTable.getSelectedRow());
+            showData();
         } catch (Exception e) {
             errorWindow(e);
         }
     }
-    public void removeRecord() {
+    public void displayResult(String resultType) {
         try {
-
+            JOptionPane.showConfirmDialog(null, new JPanel(), resultType, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         } catch (Exception e) {
             errorWindow(e);
         }
