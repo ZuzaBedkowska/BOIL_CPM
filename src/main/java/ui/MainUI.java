@@ -48,7 +48,9 @@ public class MainUI {
         removeButton.setEnabled(false);
         createAddButton();
         createEditButton();
+        createRemoveButton();
         createDisplayButton();
+        createDisplayBox();
         dataFetcher = new DataFetcher();
         showData();
     }
@@ -79,7 +81,14 @@ public class MainUI {
             errorWindow(e);
         }
     }
-    public void displayResult() {
+    public void displayResult(String resultType) {
+        try {
+            JOptionPane.showConfirmDialog(null, new JPanel(), resultType, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        } catch (Exception e) {
+            errorWindow(e);
+        }
+    }
+    public void removeRecord() {
         try {
 
         } catch (Exception e) {
@@ -92,7 +101,16 @@ public class MainUI {
     public void createEditButton() {
         editButton.addActionListener(e -> editRecord());
     }
-    public void createDisplayButton(){displayButton.addActionListener(e->displayResult());}
+    public void createRemoveButton(){
+        removeButton.addActionListener(e-> removeRecord());
+    }
+    public void createDisplayButton(){
+        displayButton.addActionListener(e->displayResult((String) displayBox.getSelectedItem()));
+    }
+    public void createDisplayBox(){
+        displayBox.setModel(new DefaultComboBoxModel<>(new String[]{"Tabela", "Diagram Gantta", "Graf CPM"}));
+
+    };
     public void errorWindow(Exception e) {
         String message = "Coś poszło nie tak!\n";
         if (e.getMessage() != null) {
