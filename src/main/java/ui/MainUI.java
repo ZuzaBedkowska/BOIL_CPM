@@ -4,9 +4,13 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+
+import static java.util.Arrays.*;
 
 class DataFetcher extends AbstractTableModel {
-
     private final String[] columnNames;
     ArrayList<Object[]> userData;
 
@@ -37,17 +41,34 @@ class DataFetcher extends AbstractTableModel {
         userData.get(row)[1] = dane[1];
         userData.get(row)[2] = dane[2];
     }
-
     public void removeData(int row) {
         userData.remove(userData.get(row));
     }
-
-    public boolean checkIfExists(Object[] data, int index) {
+    public boolean checkIfExists(Object[] data) {
         for (Object[] userDatum : userData)
-            if (userDatum[0].equals(data[index])) {
+            if (userDatum[0].equals(data[0])) {
                 return true;
             }
         return false;
+    }
+    public boolean checkIfPrevExists(Object[] data) {
+        String dane = (String) data[1];
+        List<String> poprzednicy = asList(dane.split("\\s*,\\s*"));
+        int counter = 0;
+        for (String s : poprzednicy) {
+            for (Object[] userDatum : userData) {
+                if (userDatum[0].equals(s)) {
+                    counter++;
+                }
+            }
+        }
+        return counter == poprzednicy.size();
+    }
+    public boolean checkIfPrevUnique(Object[] data) {
+        String dane = (String) data[1];
+        List<String> poprzednicy = asList(dane.split("\\s*,\\s*"));
+        Set<String> zbiorPom = new HashSet<>(poprzednicy);
+        return zbiorPom.size()== poprzednicy.size();
     }
 }
 
@@ -60,6 +81,7 @@ public class MainUI {
     private JButton editButton;
     private JButton removeButton;
     private final DataFetcher dataFetcher;
+
     public MainUI() {
         editButton.setEnabled(false);
         removeButton.setEnabled(false);
@@ -86,7 +108,7 @@ public class MainUI {
             Object[] dane = new Object[]{"","",""};
             int n = recordWindow(panel, dane, "Dodawanie rekordu");
             if (n == 0) {
-                dataChecker(dane);
+                dataChecker(dane, "add");
                 dataFetcher.addData(dane);
             }
             showData();
@@ -103,7 +125,7 @@ public class MainUI {
             Object[] dane = new Object[]{czyn,pop,czas};
             int n = recordWindow(panel, dane, "Edytowanie rekordu");
             if (n == 0) {
-                dataChecker(dane);
+                dataChecker(dane, "edit");
                 dataFetcher.editData(showTable.getSelectedRow(), dane);
             }
             showData();
@@ -173,15 +195,18 @@ public class MainUI {
             n = JOptionPane.showConfirmDialog(null, panel, title, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
             if (n == JOptionPane.OK_OPTION) {
                 record[0] = czynnosc.getText();
+                record[0] = ((String) record[0]).replaceAll("\\s", "");
                 record[1] = poprzednik.getText();
+                record[1] = ((String) record[1]).replaceAll("\\s", "");
                 record[2] = czas.getText();
+                record[2] = ((String) record[2]).replaceAll("\\s", "");
             }
         }catch (Exception e) {
             errorWindow(e);
         }
         return n;
     }
-    public void dataChecker(Object[] record) throws Exception {
+    public void dataChecker(Object[] record, String mode) throws Exception {
         String message = "\n";
         double num = 1.;
         if (record[0].equals("") || record[1].equals("") || record[2].equals("")) { //jesli zostaly puste pola
@@ -190,11 +215,16 @@ public class MainUI {
         if (record[0].equals(record[1])) { //jesli czynnosc jest swoim wlasnym nastepnikiem
             message+= "Podana czynność jest swoim własnym poprzednikiem!\n";
         }
-        if (dataFetcher.checkIfExists(record, 0)) { //sprawdź czy czynność istnieje
+        if (dataFetcher.checkIfExists(record) && mode.equals("add")) { //sprawdź czy czynność istnieje
             message+= "Podana czynność już znajduje się w tablicy!\n";
         }
-        if (!record[1].equals("-")&&!dataFetcher.checkIfExists(record, 1)) { //sprawdź czy poprzednik istnieje
-            message+= "Poprzednik nie istnieje!\n";
+        if (!record[1].equals("-")) {
+            if (!dataFetcher.checkIfPrevExists(record)) { //sprawdź czy poprzednik istnieje
+                message += "Poprzednik nie istnieje!\n";
+            }
+            if (!dataFetcher.checkIfPrevUnique(record)) { //sprawdź czy poprzednicy są unikatowi
+                message += "Poprzednicy nie są unikatowi!\n";
+            }
         }
         try {
             num = Double.parseDouble((String)record[2]);
