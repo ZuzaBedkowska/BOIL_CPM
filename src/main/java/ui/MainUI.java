@@ -44,9 +44,9 @@ class DataFetcher extends AbstractTableModel {
     public void removeData(int row) {
         userData.remove(userData.get(row));
     }
-    public boolean checkIfExists(Object[] data) {
-        for (Object[] userDatum : userData)
-            if (userDatum[0].equals(data[0])) {
+    public boolean checkIfExists(Object[] data, int row) {
+        for (int i = 0; i < userData.size(); ++i)
+            if (userData.get(i)[0].equals(data[0])&& row!=i) {
                 return true;
             }
         return false;
@@ -69,6 +69,21 @@ class DataFetcher extends AbstractTableModel {
         List<String> poprzednicy = asList(dane.split("\\s*,\\s*"));
         Set<String> zbiorPom = new HashSet<>(poprzednicy);
         return zbiorPom.size()== poprzednicy.size();
+    }
+    public void changer(String prev, String next) {//jesli uzytkownik zmieni nazwę czynnosci, powinna byc ona poprawiona w innych rekordach
+        for (Object[] userDatum : userData) {
+            userDatum[1] = ((String) userDatum[1]).replace(prev, next);
+        }
+    }
+    public void remover(String czyn) {
+        for (Object[] userDatum : userData) {
+            String data = (String) userDatum[1];
+            data = data.replace(czyn, "");
+            if (data.length() == 0) {
+                data = "-";
+            }
+            userDatum[1] = data;
+        }
     }
 }
 
@@ -108,7 +123,7 @@ public class MainUI {
             Object[] dane = new Object[]{"","",""};
             int n = recordWindow(panel, dane, "Dodawanie rekordu");
             if (n == 0) {
-                dataChecker(dane, "add");
+                dataChecker(dane, -1);
                 dataFetcher.addData(dane);
             }
             showData();
@@ -125,8 +140,9 @@ public class MainUI {
             Object[] dane = new Object[]{czyn,pop,czas};
             int n = recordWindow(panel, dane, "Edytowanie rekordu");
             if (n == 0) {
-                dataChecker(dane, "edit");
+                dataChecker(dane, showTable.getSelectedRow());
                 dataFetcher.editData(showTable.getSelectedRow(), dane);
+                dataFetcher.changer(czyn, (String) showTable.getValueAt(showTable.getSelectedRow(), 0));
             }
             showData();
         } catch (Exception e) {
@@ -135,6 +151,7 @@ public class MainUI {
     }
     public void removeRecord() {
         try {
+            dataFetcher.remover((String) showTable.getValueAt(showTable.getSelectedRow(), 0));
             dataFetcher.removeData(showTable.getSelectedRow());
             showData();
         } catch (Exception e) {
@@ -206,19 +223,24 @@ public class MainUI {
         }
         return n;
     }
-    public void dataChecker(Object[] record, String mode) throws Exception {
+    public void dataChecker(Object[] record, int row) throws Exception {
         String message = "\n";
+        String czyn = (String) record[0];
+        String pop = (String) record[1];
         double num = 1.;
         if (record[0].equals("") || record[1].equals("") || record[2].equals("")) { //jesli zostaly puste pola
             message += "Nie podano wszystkich wymaganych danych!\n";
         }
-        if (record[0].equals(record[1])) { //jesli czynnosc jest swoim wlasnym nastepnikiem
+        if (pop.contains(czyn)) { //jesli czynnosc jest swoim wlasnym nastepnikiem
             message+= "Podana czynność jest swoim własnym poprzednikiem!\n";
         }
-        if (dataFetcher.checkIfExists(record) && mode.equals("add")) { //sprawdź czy czynność istnieje
+        if (dataFetcher.checkIfExists(record, row)&&(row>-1)) { //sprawdź czy czynność istnieje
             message+= "Podana czynność już znajduje się w tablicy!\n";
         }
-        if (!record[1].equals("-")) {
+        if (pop.contains("-")&&pop.length()>1) {
+            message+= "Czynność jednocześnie posiada i nie posiada poprzednika!\n";
+        }
+        if (!((String) record[1]).contains("-")) {
             if (!dataFetcher.checkIfPrevExists(record)) { //sprawdź czy poprzednik istnieje
                 message += "Poprzednik nie istnieje!\n";
             }
