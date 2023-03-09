@@ -42,9 +42,9 @@ class DataFetcher extends AbstractTableModel {
         userData.remove(userData.get(row));
     }
 
-    public boolean checkIfExists(Object[] data) {
+    public boolean checkIfExists(Object[] data, int index) {
         for (Object[] userDatum : userData)
-            if (userDatum[0].equals(data)) {
+            if (userDatum[0].equals(data[index])) {
                 return true;
             }
         return false;
@@ -190,8 +190,11 @@ public class MainUI {
         if (record[0].equals(record[1])) { //jesli czynnosc jest swoim wlasnym nastepnikiem
             message+= "Podana czynność jest swoim własnym poprzednikiem!\n";
         }
-        if (dataFetcher.checkIfExists(record)) {
+        if (dataFetcher.checkIfExists(record, 0)) { //sprawdź czy czynność istnieje
             message+= "Podana czynność już znajduje się w tablicy!\n";
+        }
+        if (!record[1].equals("-")&&!dataFetcher.checkIfExists(record, 1)) { //sprawdź czy poprzednik istnieje
+            message+= "Poprzednik nie istnieje!\n";
         }
         try {
             num = Double.parseDouble((String)record[2]);
