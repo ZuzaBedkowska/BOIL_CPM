@@ -14,8 +14,16 @@ public class MainLogic {
         testingData.add(new ActivityInput("F","D,   E",15.));
         testingData.add(new ActivityInput("G","E",12.));
         testingData.add(new ActivityInput("H","F, G",8.));
+        
+        if (calc(testingData) != 0)
+            System.err.println("there was some error in calc()!");
     }
     public Integer calc(ArrayList<ActivityInput> activityInputs){
+        //convert ActivityInput to Activity and save in allActivities
+        for (ActivityInput a : activityInputs)
+            allActivities.add(new Activity(a, allActivities));
+
+        
         return 0x0;
     }
 
