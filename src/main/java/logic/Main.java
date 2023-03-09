@@ -1,4 +1,4 @@
-package org.example;
+package logic;
 import ui.MainUI;
 
 import javax.swing.*;
