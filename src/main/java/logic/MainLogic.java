@@ -1,9 +1,11 @@
 package logic;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
 public class MainLogic {
     ArrayList<Activity> allActivities = new ArrayList<Activity>();
+    ArrayList<Event> allEvents = new ArrayList<Event>();
     public void test(){
         ArrayList<ActivityInput> testingData = new ArrayList<ActivityInput>();
         testingData.add(new ActivityInput("A","-",6.));
@@ -23,9 +25,21 @@ public class MainLogic {
         for (ActivityInput a : activityInputs)
             allActivities.add(new Activity(a, allActivities));
 
-        
+        basicDumbAlgorithm();
+
         return 0x0;
     }
+    private void basicDumbAlgorithm() {
+        //most suboptimal algorithm ever
+        //step1: add every Activity with empty directlyPrecedingActivities to out of first Event
+        ArrayList<Activity> outActivitiesToAdd = new ArrayList<Activity>();
+        for (Activity a : allActivities)
+            if (a.directlyPrecedingActivities.size() <= 0)
+                outActivitiesToAdd.add(a);
+        allEvents.add(new Event("", new ArrayList<Activity>(), outActivitiesToAdd));
 
+
+
+    }
 
 }
