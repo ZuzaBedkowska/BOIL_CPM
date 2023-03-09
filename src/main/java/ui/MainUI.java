@@ -41,6 +41,15 @@ class DataFetcher extends AbstractTableModel {
     public void removeData(int row) {
         userData.remove(userData.get(row));
     }
+
+    public boolean checkIfExists(Object[] data) {
+        for (int i = 0; i < userData.size(); ++i) {
+            if (userData.get(i)[0].equals(data)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 public class MainUI {
@@ -78,6 +87,7 @@ public class MainUI {
             Object[] dane = new Object[]{"","",""};
             int n = recordWindow(panel, dane, "Dodawanie rekordu");
             if (n == 0) {
+                dataChecker(dane);
                 dataFetcher.addData(dane);
             }
             showData();
@@ -94,6 +104,7 @@ public class MainUI {
             Object[] dane = new Object[]{czyn,pop,czas};
             int n = recordWindow(panel, dane, "Edytowanie rekordu");
             if (n == 0) {
+                dataChecker(dane);
                 dataFetcher.editData(showTable.getSelectedRow(), dane);
             }
             showData();
@@ -170,5 +181,20 @@ public class MainUI {
             errorWindow(e);
         }
         return n;
+    }
+    public void dataChecker(Object[] record) throws Exception {
+        String message = "\n";
+        if (record[0].equals("") || record[1].equals("") || record[2].equals("")) { //jesli zostaly puste pola
+            message += "Nie podano wszystkich wymaganych danych!\n";
+        }
+        if (record[0].equals(record[1])) { //jesli czynnosc jest swoim wlasnym nastepnikiem
+            message+= "Podana czynność jest swoim własnym poprzednikiem!\n";
+        }
+        if (dataFetcher.checkIfExists(record)) {
+            message+= "Podana czynność już znajduje się w tablicy!\n";
+        }
+        if (!message.equals("\n")) {
+            throw new Exception(message);
+        }
     }
 }
