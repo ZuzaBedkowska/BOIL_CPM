@@ -7,6 +7,8 @@ public class Activity {
     public ArrayList<Activity> directlyPrecedingActivities;
     public Double time;
 
+    public Event eventFrom, eventTo;
+
     public Activity(String name, ArrayList<Activity> directlyPrecedingActivities, Double time) {
         this.name = name;
         this.directlyPrecedingActivities = directlyPrecedingActivities;
@@ -32,5 +34,11 @@ public class Activity {
 
         this.directlyPrecedingActivities = activities;
         this.time = activityInput.time;
+    }
+    public void addEventFrom(Event eventFrom){
+        this.eventFrom = eventFrom;
+    }
+    public void addEventTo(Event eventTo){
+        this.eventTo = eventTo;
     }
 }

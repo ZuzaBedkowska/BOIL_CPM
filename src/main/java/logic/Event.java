@@ -11,5 +11,8 @@ public class Event {
         this.name = name;
         this.inActivites = inActivites;
         this.outActivites = outActivites;
+        //add EventFrom to all outActivities
+        for (Activity a: outActivites)
+            a.addEventFrom(this);
     }
 }

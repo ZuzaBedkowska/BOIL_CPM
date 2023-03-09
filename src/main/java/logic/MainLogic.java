@@ -35,10 +35,17 @@ public class MainLogic {
         ArrayList<Activity> outActivitiesToAdd = new ArrayList<Activity>();
         for (Activity a : allActivities)
             if (a.directlyPrecedingActivities.size() <= 0)
-                outActivitiesToAdd.add(a);
+                outActivitiesToAdd.add(a); //add to Event
+
         allEvents.add(new Event("", new ArrayList<Activity>(), outActivitiesToAdd));
 
+        //step2: some fancy loop
+        while (true) {
+            //step2a: for each "out" without "in" create new event
 
+
+            //step2b: if pre is in "in" put in "out"
+        }
 
     }
 
