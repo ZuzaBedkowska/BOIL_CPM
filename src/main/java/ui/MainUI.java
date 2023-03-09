@@ -76,8 +76,10 @@ public class MainUI {
         try{
             JPanel panel = new JPanel(new GridLayout(0, 1));
             Object[] dane = new Object[]{"","",""};
-            recordWindow(panel, dane, "Dodawanie rekordu");
-            dataFetcher.addData(dane);
+            int n = recordWindow(panel, dane, "Dodawanie rekordu");
+            if (n == 0) {
+                dataFetcher.addData(dane);
+            }
             showData();
         } catch (Exception e) {
             errorWindow(e);
@@ -90,8 +92,10 @@ public class MainUI {
             String pop = (String) showTable.getValueAt(showTable.getSelectedRow(), 1);
             String czas = ((String) showTable.getValueAt(showTable.getSelectedRow(), 2));
             Object[] dane = new Object[]{czyn,pop,czas};
-            recordWindow(panel, dane, "Edytowanie rekordu");
-            dataFetcher.editData(showTable.getSelectedRow(), dane);
+            int n = recordWindow(panel, dane, "Edytowanie rekordu");
+            if (n == 0) {
+                dataFetcher.editData(showTable.getSelectedRow(), dane);
+            }
             showData();
         } catch (Exception e) {
             errorWindow(e);
@@ -144,7 +148,8 @@ public class MainUI {
         message += "Spróbuj ponownie!\n";
         JOptionPane.showMessageDialog(new JFrame(), message);
     }
-    public void recordWindow(JPanel panel, Object[] record, String title) {
+    public int recordWindow(JPanel panel, Object[] record, String title) {
+        int n = 2;
         try {
             JTextField czynnosc = new JTextField((String) record[0]);
             JTextField poprzednik = new JTextField((String) record[1]);
@@ -155,13 +160,15 @@ public class MainUI {
             panel.add(poprzednik);
             panel.add(new JLabel("Czas trwania:"));
             panel.add(czas);
-            JOptionPane.showConfirmDialog(null, panel, title, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-            record[0] = czynnosc.getText();
-            record[1] = poprzednik.getText();
-            record[2] = czas.getText();
-
+            n = JOptionPane.showConfirmDialog(null, panel, title, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (n == JOptionPane.OK_OPTION) {
+                record[0] = czynnosc.getText();
+                record[1] = poprzednik.getText();
+                record[2] = czas.getText();
+            }
         }catch (Exception e) {
             errorWindow(e);
         }
+        return n;
     }
 }
