@@ -42,8 +42,15 @@ public class MainLogic {
         //step2: some fancy loop
         while (true) {
             //step2a: for each "out" without "in" create new event
-
-
+            for(Activity a: allActivities){
+                //if there is from but no to
+                if (a.eventFrom.size() >0 && a.eventTo.size() <= 0){
+                    ArrayList<Activity> inActivitiesToAdd = new ArrayList<Activity>();
+                    inActivitiesToAdd.add(a);
+                    allEvents.add(new Event("",inActivitiesToAdd, new ArrayList<Activity>()));
+                }
+            }
+            break;
             //step2b: if pre is in "in" put in "out"
         }
 
