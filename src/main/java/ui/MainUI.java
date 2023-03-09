@@ -87,6 +87,38 @@ class DataFetcher extends AbstractTableModel {
     }
 }
 
+class ResultFetcher extends AbstractTableModel {
+    ArrayList<Object[]> userData;
+    private final String[] columnNames;
+
+    public ResultFetcher() {
+        columnNames = new String[]{"Czynność", "Czas", "ES", "EF", "LS", "LF", "Rezerwa", "Czynność krytyczna"};
+        userData = new ArrayList<>();
+    }
+
+    public void setUserData (DataFetcher dataFetcher) {
+        for (int i = 0; i<dataFetcher.getRowCount(); ++i) {
+            Object[] dane = new Object[]{dataFetcher.getValueAt(i, 0), dataFetcher.getValueAt(i,2), "", "", "", "", "", ""};
+            userData.add(dane);
+        }
+    }
+    @Override
+    public int getRowCount() {
+        return userData.size();
+    }
+    @Override
+    public int getColumnCount() {
+        return columnNames.length;
+    }
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        return userData.get(rowIndex)[columnIndex];
+    }
+    public String getColumnName(int col) {
+        return columnNames[col];
+    }
+}
+
 public class MainUI {
     private JPanel rootPanel;
     private JComboBox<String> displayBox;
@@ -96,6 +128,7 @@ public class MainUI {
     private JButton editButton;
     private JButton removeButton;
     private final DataFetcher dataFetcher;
+    private ResultFetcher resultFetcher;
 
     public MainUI() {
         editButton.setEnabled(false);
@@ -160,7 +193,17 @@ public class MainUI {
     }
     public void displayResult(String resultType) {
         try {
-            JOptionPane.showConfirmDialog(null, new JPanel(), resultType, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            JPanel panel = new JPanel(new GridLayout(0, 1));
+            if ("Tabela".equals(resultType)) {
+                JTable resultTable = new JTable();
+                resultTable.setModel(resultFetcher);
+                JScrollPane scroll= new JScrollPane(resultTable);
+                scroll.setSize(new Dimension(1000, 10));
+                scroll.setPreferredSize(new Dimension(1000, scroll.getPreferredSize().height));
+                panel.add(scroll);
+            }
+
+            JOptionPane.showConfirmDialog(null, panel, resultType, JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
         } catch (Exception e) {
             errorWindow(e);
         }
@@ -175,7 +218,11 @@ public class MainUI {
         removeButton.addActionListener(e-> removeRecord());
     }
     public void createDisplayButton(){
-        displayButton.addActionListener(e->displayResult((String) displayBox.getSelectedItem()));
+        displayButton.addActionListener(e->{
+            resultFetcher = new ResultFetcher();
+            resultFetcher.setUserData(dataFetcher);
+            displayResult((String) displayBox.getSelectedItem());
+        });
     }
     public void createDisplayBox(){
         displayBox.setModel(new DefaultComboBoxModel<>(new String[]{"Tabela", "Diagram Gantta", "Graf CPM"}));
@@ -205,7 +252,7 @@ public class MainUI {
             JTextField czas = new JTextField((String) record[2]);
             panel.add(new JLabel("Czynność:"));
             panel.add(czynnosc);
-            panel.add(new JLabel("Poprzednik:"));
+            panel.add(new JLabel("Poprzednik:\n"));
             panel.add(poprzednik);
             panel.add(new JLabel("Czas trwania:"));
             panel.add(czas);
@@ -231,7 +278,7 @@ public class MainUI {
         if (record[0].equals("") || record[1].equals("") || record[2].equals("")) { //jesli zostaly puste pola
             message += "Nie podano wszystkich wymaganych danych!\n";
         }
-        if (pop.contains(czyn)) { //jesli czynnosc jest swoim wlasnym nastepnikiem
+        if (pop.contains(czyn)) { //jesli czynnosc jest swoim wlasnym poprzednikiem
             message+= "Podana czynność jest swoim własnym poprzednikiem!\n";
         }
         if (dataFetcher.checkIfExists(record, row)&&(row>-1)) { //sprawdź czy czynność istnieje
