@@ -50,10 +50,18 @@ public class MainLogic {
                     allEvents.add(new Event("",inActivitiesToAdd, new ArrayList<Activity>()));
                 }
             }
-            break;
             //step2b: if pre is in "in" put in "out"
+            for(Activity a: allActivities){
+                for (Activity pre: a.directlyPrecedingActivities){
+                    for (Event e: allEvents){
+                        for (Activity in: e.inActivites){
+                            if (pre == in)
+                                e.outActivites.add(a);
+                        }
+                    }
+                }
+            }
+            break;
         }
-
     }
-
 }
