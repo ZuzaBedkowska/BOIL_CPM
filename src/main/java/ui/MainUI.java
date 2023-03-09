@@ -43,11 +43,10 @@ class DataFetcher extends AbstractTableModel {
     }
 
     public boolean checkIfExists(Object[] data) {
-        for (int i = 0; i < userData.size(); ++i) {
-            if (userData.get(i)[0].equals(data)) {
+        for (Object[] userDatum : userData)
+            if (userDatum[0].equals(data)) {
                 return true;
             }
-        }
         return false;
     }
 }
@@ -184,6 +183,7 @@ public class MainUI {
     }
     public void dataChecker(Object[] record) throws Exception {
         String message = "\n";
+        double num = 1.;
         if (record[0].equals("") || record[1].equals("") || record[2].equals("")) { //jesli zostaly puste pola
             message += "Nie podano wszystkich wymaganych danych!\n";
         }
@@ -192,6 +192,14 @@ public class MainUI {
         }
         if (dataFetcher.checkIfExists(record)) {
             message+= "Podana czynność już znajduje się w tablicy!\n";
+        }
+        try {
+            num = Double.parseDouble((String)record[2]);
+        } catch (NumberFormatException nfe) {
+            message+= "Podany czas nie jest liczbą!\n";
+        }
+        if (num < 0) {
+            message += "Czas wykonania zadania jest mniejszy od 0!\n";
         }
         if (!message.equals("\n")) {
             throw new Exception(message);
