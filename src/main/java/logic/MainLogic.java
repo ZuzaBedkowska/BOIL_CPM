@@ -107,6 +107,10 @@ public class MainLogic {
                     }
                 if (eventIsRemovable) {
                     e1.inActivites.addAll(e2.inActivites); //move all inActivities from 2nd to 1st
+                    for (Activity aa : e2.inActivites){
+                        aa.eventTo.remove(e2);
+                        aa.eventTo.add(e1);
+                    }
                     toRemove.add(e2); //and remove the duplicate (actually add to remove queue)
                 }
             }
@@ -122,22 +126,17 @@ public class MainLogic {
                 System.out.println("activity "+a.name+" needs to be rebuild");
             }
     }
-    //TOFIX: activity after simplifySameOuts breaks lol, still points to old event
     private void apparentActivityCase2(){
         for (Event e: allEvents){
             if (e.outActivites.size() < 2)
                 continue;
             ArrayList<Event> toEvents = new ArrayList<Event>();
-            System.out.println(e.name);
             for (Activity a : e.outActivites) {
-                System.out.println(toEvents);
                 if (toEvents.contains(a.eventTo.get(0))){
                     System.out.println("activity "+a.name+" needs to be rebuild");
                 }
                 toEvents.add(a.eventTo.get(0));
-                System.out.println(" added "+a.eventTo.get(0).name);
             }
-            System.out.println("  break");
         }
     }
 }
