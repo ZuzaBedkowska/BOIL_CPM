@@ -1,6 +1,6 @@
 package logic;
 
-import javax.swing.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainLogic {
@@ -16,6 +16,7 @@ public class MainLogic {
                 System.out.print(a.name);
             System.out.println();
         }
+        System.out.println();
     }
     public void test(){
         ArrayList<ActivityInput> testingData = new ArrayList<ActivityInput>();
@@ -38,6 +39,8 @@ public class MainLogic {
             allActivities.add(new Activity(a, allActivities));
 
         basicDumbAlgorithm();
+        testPrint();
+        simplifySameOuts();
         testPrint();
         return 0x0;
     }
@@ -81,5 +84,32 @@ public class MainLogic {
             if (!waitIHaveWorkToDo)
                 break;
         }
+    }
+    private void simplifySameOuts(){
+        ArrayList<Event> toRemove = new ArrayList<Event>();
+        for (int i = 0; i < allEvents.size(); i++) {
+            Event e1 = allEvents.get(i);
+            for (int j = i+1; j < allEvents.size(); j++) {
+                Event e2 = allEvents.get(j);
+                if (e1 == e2)
+                    break;
+                if (e1.outActivites.size() != e2.outActivites.size())
+                    break;
+                boolean eventIsRemovable = true;
+                for (Activity a : e1.outActivites)
+                    if (!e2.outActivites.contains(a)) {
+                        eventIsRemovable = false;
+                        break;
+                    }
+                if (eventIsRemovable) {
+                    e1.inActivites.addAll(e2.inActivites); //move all inActivities from 2nd to 1st
+                    toRemove.add(e2); //and remove the duplicate (actually add to remove queue)
+                }
+            }
+        }
+        allEvents.removeAll(toRemove); //remove all from remove queue
+        //clear Activities from removed Events
+        for (Activity a: allActivities)
+            a.eventFrom.removeAll(toRemove);
     }
 }
