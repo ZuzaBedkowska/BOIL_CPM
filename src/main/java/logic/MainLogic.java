@@ -26,8 +26,9 @@ public class MainLogic {
             System.out.print("->");
             for (Event e: a.eventTo)
                 System.out.print(e.name);
-            System.out.println("  \t"+a.ES+"  \t"+a.EF+"\t"+a.LS+"\t"+a.LF+"\t"+a.reserve+"\t"+(a.isCritical?"+":"-"));
+            System.out.println("  \t"+String.format("%4s",a.ES)+String.format("  \t%4s",a.EF)+String.format("\t%4s",a.LS)+String.format("\t%4s",a.LF)+String.format("\t%4s",a.reserve)+(a.isCritical?"\tcrit":""));
         }
+
         System.out.println();
     }
     public boolean resetEverything(){
@@ -60,15 +61,23 @@ public class MainLogic {
     public void test(){
         ArrayList<ActivityInput> testingData = new ArrayList<ActivityInput>();
 
-        testingData.add(new ActivityInput("A","-",6.));
+        /*testingData.add(new ActivityInput("A","-",6.));
         testingData.add(new ActivityInput("B","-",8.));
         testingData.add(new ActivityInput("C","A,B",12.));
         testingData.add(new ActivityInput("D","C",4.));
         testingData.add(new ActivityInput("E","C",6.));
         testingData.add(new ActivityInput("F","D,   E",15.));
         testingData.add(new ActivityInput("G","E",12.));
-        testingData.add(new ActivityInput("H","F, G",8.));
+        testingData.add(new ActivityInput("H","F, G",8.));*/
 
+        testingData.add(new ActivityInput("A","-",5));
+        testingData.add(new ActivityInput("B","-",7));
+        testingData.add(new ActivityInput("C","A",6));
+        testingData.add(new ActivityInput("D","A",8));
+        testingData.add(new ActivityInput("E","B",3));
+        testingData.add(new ActivityInput("F","C",4));
+        testingData.add(new ActivityInput("G","C",2));
+        testingData.add(new ActivityInput("H","E,D,F",5));
         for (ActivityInput a : testingData)
             addActivityInput(a);
 
@@ -80,6 +89,9 @@ public class MainLogic {
         simplifySameOuts();
         apparentActivityCase1();
         apparentActivityCase2();
+        CriticalPath criticalPath = new CriticalPath(allActivities,allEvents);
+        criticalPath.calc();
+
         testPrintEvents();
         testPrintActivities();
         return 0x0;
@@ -153,8 +165,10 @@ public class MainLogic {
         }
         allEvents.removeAll(toRemove); //remove all from remove queue
         //clear Activities from removed Events
-        for (Activity a: allActivities)
+        for (Activity a: allActivities){
             a.eventFrom.removeAll(toRemove);
+            a.eventTo.removeAll(toRemove);
+        }
     }
     private void apparentActivityCase1(){
         ArrayList<Activity> toAllActivities = new ArrayList<>();
@@ -212,9 +226,5 @@ public class MainLogic {
         }
         allEvents.addAll(toAllEvents);
         allActivities.addAll(toAllActivities);
-    }
-    private void criticalPathStepForward(){
-
-
     }
 }

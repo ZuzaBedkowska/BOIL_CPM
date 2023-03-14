@@ -49,4 +49,9 @@ public class Activity {
     public String getApparentName(){
         return ("p"+Integer.toString(apparentCounter++));
     }
+
+    public Double getES() {return ES;}
+    public Double getEF() {return EF;}
+    public Double getLS() {return LS;}
+    public Double getLF() {return LF;}
 }
