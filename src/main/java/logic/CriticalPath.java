@@ -12,6 +12,7 @@ public class CriticalPath {
     }
     public void calc(){
         criticalPathStepForward();
+        criticalPathStepBackward();
     }
     private Event findFistEvent(){
         ArrayList<Event> firstEvent = new ArrayList<>();
@@ -77,6 +78,22 @@ public class CriticalPath {
         recursiveStepBackward(startFrom);
     }
     private void recursiveStepBackward(Event e) {
-    
+        ArrayList<Event> nextEvents = new ArrayList<>();
+        if (e.outActivites.size() == 0) { //no activity exits event
+            for (Activity a: e.inActivites) {
+                a.LF = e.inActivites.stream().max(Comparator.comparing(Activity::getEF)).get().EF;
+                a.LS = a.LF - a.time;
+                nextEvents.addAll(a.eventFrom);
+            }
+        }
+        else { //some activity exits event
+            for (Activity a: e.inActivites) {
+                a.LF = e.outActivites.stream().min(Comparator.comparing(Activity::getLS)).get().LS;
+                a.LS = a.LF - a.time;
+                nextEvents.addAll(a.eventFrom);
+            }
+        }
+        for (Event nextE: nextEvents)
+            recursiveStepBackward(nextE);
     }
 }
