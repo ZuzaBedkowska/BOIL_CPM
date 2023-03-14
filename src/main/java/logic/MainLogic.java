@@ -1,5 +1,6 @@
 package logic;
 
+import javax.swing.*;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
@@ -18,6 +19,34 @@ public class MainLogic {
         }
         System.out.println();
     }
+
+    public boolean resetEverything(){
+        try {
+            allActivities.clear();
+            allEvents.clear();
+        }
+        catch (Exception e){
+            System.err.println("error in resetEveryThing()");
+            return false;
+        }
+        return true;
+    }
+    public boolean addActivityInput(ActivityInput activityInputToAdd){
+        ArrayList<ActivityInput> t = new ArrayList<ActivityInput>();
+        t.add(activityInputToAdd);
+        return addActivityInput(t);
+    }
+    public boolean addActivityInput(ArrayList<ActivityInput> activityInputToAdd){
+        try {
+            for (ActivityInput a : activityInputToAdd)
+                allActivities.add(new Activity(a, allActivities));
+        }
+        catch (Exception e){
+            System.err.println("error while adding activityInputToAdd");
+            return false;
+        }
+        return true;
+    }
     public void test(){
         ArrayList<ActivityInput> testingData = new ArrayList<ActivityInput>();
 
@@ -30,14 +59,13 @@ public class MainLogic {
         testingData.add(new ActivityInput("G","E",12.));
         testingData.add(new ActivityInput("H","F, G",8.));
 
-        if (calc(testingData) != 0)
+        for (ActivityInput a : testingData)
+            addActivityInput(a);
+
+        if (calc() != 0)
             System.err.println("there was some error in calc()!");
     }
-    public Integer calc(ArrayList<ActivityInput> activityInputs){
-        //convert ActivityInput to Activity and save in allActivities
-        for (ActivityInput a : activityInputs)
-            allActivities.add(new Activity(a, allActivities));
-
+    public Integer calc(){
         basicDumbAlgorithm();
         simplifySameOuts();
         apparentActivityCase1();
