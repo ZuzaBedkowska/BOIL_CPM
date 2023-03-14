@@ -12,7 +12,6 @@ public class CriticalPath {
     }
     public void calc(){
         criticalPathStepForward();
-        System.out.println("lol it eventually ended");
     }
     private Event findFistEvent(){
         ArrayList<Event> firstEvent = new ArrayList<>();
@@ -28,10 +27,23 @@ public class CriticalPath {
         }
         return firstEvent.get(0);
     }
+    private Event findLastEvent(){
+        ArrayList<Event> lastEvent = new ArrayList<>();
+        try {
+            for (Event e: allEvents)
+                if (e.outActivites.size()==0)
+                    lastEvent.add(e);
+            if (lastEvent.size()>1)
+                throw(new Exception());
+        }
+        catch (Exception e){
+            System.err.println("error in findFistEvent(): there is more than one first event");
+        }
+        return lastEvent.get(0);
+    }
     private void criticalPathStepForward(){
         Event startFrom = findFistEvent();
         recursiveStepForward(startFrom);
-
     }
     private void recursiveStepForward(Event e){
         ArrayList<Event> nextEvents = new ArrayList<>();
@@ -59,5 +71,12 @@ public class CriticalPath {
         //can be added: calc T (max of EF of last Event)
         for (Event nextE: nextEvents)
             recursiveStepForward(nextE);
+    }
+    private void criticalPathStepBackward(){
+        Event startFrom = findLastEvent();
+        recursiveStepBackward(startFrom);
+    }
+    private void recursiveStepBackward(Event e) {
+    
     }
 }
