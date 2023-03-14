@@ -7,6 +7,7 @@ public class Event {
     public ArrayList<Activity> inActivites;
     public ArrayList<Activity> outActivites;
     private static int eventCounter = 0;
+    private static int apparentCounter = 0;
     public Event(String name, ArrayList<Activity> inActivites, ArrayList<Activity> outActivites) {
         this.name = name;
         this.name = Integer.toString(eventCounter++);
@@ -15,5 +16,8 @@ public class Event {
         //add EventFrom to all outActivities
         for (Activity a: outActivites)
             a.addEventFrom(this);
+    }
+    public String getApparentName(){
+        return ("e"+Integer.toString(apparentCounter++));
     }
 }

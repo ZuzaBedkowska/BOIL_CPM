@@ -1,13 +1,11 @@
 package logic;
 
-import javax.swing.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainLogic {
     ArrayList<Activity> allActivities = new ArrayList<Activity>();
     ArrayList<Event> allEvents = new ArrayList<Event>();
-    private void testPrint(){
+    private void testPrintEvents(){
         for (Event e: allEvents){
             System.out.print(e.name+":");
             for (Activity a: e.inActivites)
@@ -19,7 +17,19 @@ public class MainLogic {
         }
         System.out.println();
     }
+    private void testPrintActivities(){
 
+        for (Activity a : allActivities){
+            System.out.print(a.name+": ");
+            for (Event e: a.eventFrom)
+                System.out.print(e.name);
+            System.out.print("->");
+            for (Event e: a.eventTo)
+                System.out.print(e.name);
+            System.out.println("  \t"+a.ES+"  \t"+a.EF+"\t"+a.LS+"\t"+a.LF+"\t"+a.reserve+"\t"+(a.isCritical?"+":"-"));
+        }
+        System.out.println();
+    }
     public boolean resetEverything(){
         try {
             allActivities.clear();
@@ -70,7 +80,8 @@ public class MainLogic {
         simplifySameOuts();
         apparentActivityCase1();
         apparentActivityCase2();
-        testPrint();
+        testPrintEvents();
+        testPrintActivities();
         return 0x0;
     }
     private void basicDumbAlgorithm() {
@@ -152,7 +163,7 @@ public class MainLogic {
                 //add new apparent activity
                 ArrayList<Activity> directlyPrecedingActivities = new ArrayList<>();
                 directlyPrecedingActivities.addAll(a.directlyPrecedingActivities);
-                Activity toAdd = new Activity("<nA1>",directlyPrecedingActivities,0.);
+                Activity toAdd = new Activity(a.getApparentName(),directlyPrecedingActivities,0.);
                 toAllActivities.add(toAdd);
                 //add EventFrom and EventTo to newly created apparent activity
                 toAdd.eventFrom.add(a.eventFrom.get(1));
@@ -178,14 +189,14 @@ public class MainLogic {
                     //adding apparent activity
                     ArrayList<Activity> directlyPrecedingActivities = new ArrayList<>();
                     directlyPrecedingActivities.add(a);
-                    Activity toAdd = new Activity("<nA2>",directlyPrecedingActivities,0.);
+                    Activity toAdd = new Activity(a.getApparentName(),directlyPrecedingActivities,0.);
                     toAllActivities.add(toAdd);
                     //adding new apparent event
                     ArrayList<Activity> inA = new ArrayList<>();
                     ArrayList<Activity> outA = new ArrayList<>();
                     inA.add(a);
                     outA.add(toAdd);
-                    toAllEvents.add(new Event("<nE2>",inA, outA));
+                    toAllEvents.add(new Event(e.getApparentName(),inA, outA));
                     //note: within Event constructor eventFrom is added automatic
                     //add eventTo to apparent activity
                     toAdd.eventTo.add(a.eventTo.get(0));
@@ -201,5 +212,9 @@ public class MainLogic {
         }
         allEvents.addAll(toAllEvents);
         allActivities.addAll(toAllActivities);
+    }
+    private void criticalPathStepForward(){
+
+
     }
 }

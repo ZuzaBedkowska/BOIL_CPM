@@ -9,6 +9,11 @@ public class Activity {
 
     public ArrayList<Event> eventFrom = new ArrayList<Event>(), eventTo = new ArrayList<Event>();
 
+    public Double ES=0., EF=0., LS=0., LF=0., reserve=0.;
+    public Boolean isCritical = false;
+
+    private static int apparentCounter = 0;
+
     public Activity(String name, ArrayList<Activity> directlyPrecedingActivities, Double time) {
         this.name = name;
         this.directlyPrecedingActivities = directlyPrecedingActivities;
@@ -40,5 +45,8 @@ public class Activity {
     }
     public void addEventTo(Event eventTo){
         this.eventTo.add(eventTo);
+    }
+    public String getApparentName(){
+        return ("p"+Integer.toString(apparentCounter++));
     }
 }
