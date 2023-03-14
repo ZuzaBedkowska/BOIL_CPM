@@ -39,11 +39,8 @@ public class MainLogic {
             allActivities.add(new Activity(a, allActivities));
 
         basicDumbAlgorithm();
-        testPrint();
         simplifySameOuts();
-        testPrint();
         apparentActivityCase1();
-        testPrint();
         apparentActivityCase2();
         testPrint();
         return 0x0;
@@ -124,9 +121,6 @@ public class MainLogic {
         ArrayList<Activity> toAllActivities = new ArrayList<>();
         for (Activity a: allActivities)
             if (a.eventFrom.size() >= 2) {
-                System.out.println("activity "+a.name+" needs to be rebuild:");
-                System.out.println(" # delete activity from "+a.eventFrom.get(1).name+" to "+a.eventTo.get(0).name);
-                System.out.println(" # add new activity from "+a.eventFrom.get(1).name+" to "+a.eventFrom.get(0).name);
                 //add new apparent activity
                 ArrayList<Activity> directlyPrecedingActivities = new ArrayList<>();
                 directlyPrecedingActivities.addAll(a.directlyPrecedingActivities);
@@ -153,9 +147,6 @@ public class MainLogic {
             ArrayList<Event> toEvents = new ArrayList<Event>();
             for (Activity a : e.outActivites) {
                 if (toEvents.contains(a.eventTo.get(0))){
-                    System.out.println("activity "+a.name+" needs to be rebuild");
-                    System.out.println(" # remount "+a.eventFrom.get(0).name+" -> "+a.eventTo.get(0).name+" to "+a.eventFrom.get(0).name+" -> <nE2>");
-                    System.out.println(" # add new activity from <nE2> -> "+a.eventTo.get(0).name);
                     //adding apparent activity
                     ArrayList<Activity> directlyPrecedingActivities = new ArrayList<>();
                     directlyPrecedingActivities.add(a);
