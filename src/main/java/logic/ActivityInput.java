@@ -13,6 +13,9 @@ public class ActivityInput {
         this.directlyPrecedingActivities = directlyPrecedingActivities;
         this.time = time;
     }
+    public ActivityInput(String name, String directlyPrecedingActivities, Integer time) {
+        this(name,directlyPrecedingActivities,Double.valueOf(time));
+    }
     public ActivityInput(String name, String directlyPrecedingActivities, Double time) {
         name = name.replaceAll(" ", ""); //remove all spaces
         directlyPrecedingActivities = directlyPrecedingActivities.replaceAll(" ", ""); //remove all spaces
