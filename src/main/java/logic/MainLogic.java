@@ -18,7 +18,7 @@ public class MainLogic {
         System.out.println();
     }
     private void testPrintActivities(){
-
+        System.out.println("        \t"+"time\t  ES\t  EF\t  LS\t  LF\t reserve");
         for (Activity a : allActivities){
             System.out.print(a.name+": ");
             for (Event e: a.eventFrom)
@@ -26,7 +26,7 @@ public class MainLogic {
             System.out.print("->");
             for (Event e: a.eventTo)
                 System.out.print(e.name);
-            System.out.println("  \t"+String.format("%4s",a.ES)+String.format("  \t%4s",a.EF)+String.format("\t%4s",a.LS)+String.format("\t%4s",a.LF)+String.format("\t%4s",a.reserve)+(a.isCritical?"\tcrit":""));
+            System.out.println("  \t"+String.format("%4s",a.time)+String.format("\t%4s",a.ES)+String.format("\t%4s",a.EF)+String.format("\t%4s",a.LS)+String.format("\t%4s",a.LF)+String.format("\t%4s",a.reserve)+(a.isCritical?"\tcrit":""));
         }
 
         System.out.println();

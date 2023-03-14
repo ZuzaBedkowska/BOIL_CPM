@@ -13,6 +13,7 @@ public class CriticalPath {
     public void calc(){
         criticalPathStepForward();
         criticalPathStepBackward();
+        calculateReserve();
     }
     private Event findFistEvent(){
         ArrayList<Event> firstEvent = new ArrayList<>();
@@ -95,5 +96,12 @@ public class CriticalPath {
         }
         for (Event nextE: nextEvents)
             recursiveStepBackward(nextE);
+    }
+    private void calculateReserve(){
+        for (Activity a: allActivities){
+            a.reserve = a.LS - a.ES;
+            if (a.reserve == 0)
+                a.isCritical = true;
+        }
     }
 }
