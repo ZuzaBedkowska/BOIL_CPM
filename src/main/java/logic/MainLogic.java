@@ -121,12 +121,35 @@ public class MainLogic {
             a.eventFrom.removeAll(toRemove);
     }
     private void apparentActivityCase1(){
+        ArrayList<Activity> toAllActivities = new ArrayList<>();
         for (Activity a: allActivities)
             if (a.eventFrom.size() >= 2) {
-                System.out.println("activity "+a.name+" needs to be rebuild");
+                System.out.println("activity "+a.name+" needs to be rebuild:");
+                System.out.println(" # delete activity from "+a.eventFrom.get(1).name+" to "+a.eventTo.get(0).name);
+                System.out.println(" # add new activity from "+a.eventFrom.get(1).name+" to "+a.eventFrom.get(0).name);
+
+
+                //delete 2nd mount
+                a.eventFrom.get(1).outActivites.remove(a);
+                a.eventFrom.remove(1);
+
+                ArrayList<Activity> directlyPrecedingActivities = new ArrayList<>();
+                directlyPrecedingActivities.addAll(a.directlyPrecedingActivities);
+                Activity toAdd = new Activity("<nA1>",directlyPrecedingActivities,0.);
+                toAllActivities.add(toAdd);
+
+                //CHECK TIME
+                //Activity toAdd = new Activity("<new>",a.directlyPrecedingActivities,0.);
+                //toAdd.addEventFrom(a.eventFrom.get(1));
+                //toAdd.addEventTo(a.eventFrom.get(0));
+                //a.eventTo.remove(0);
+                //addToActivities.add(toAdd);
             }
+        //allActivities.addAll(addToActivities);
     }
     private void apparentActivityCase2(){
+        ArrayList<Event> toAllEvents = new ArrayList<>();
+        ArrayList<Activity> toAllActivities = new ArrayList<>();
         for (Event e: allEvents){
             if (e.outActivites.size() < 2)
                 continue;
@@ -134,9 +157,33 @@ public class MainLogic {
             for (Activity a : e.outActivites) {
                 if (toEvents.contains(a.eventTo.get(0))){
                     System.out.println("activity "+a.name+" needs to be rebuild");
+                    System.out.println(" # remount "+a.eventFrom.get(0).name+" -> "+a.eventTo.get(0).name+" to "+a.eventFrom.get(0).name+" -> <nE2>");
+                    System.out.println(" # add new activity from <nE2> -> "+a.eventTo.get(0).name);
+
+                    ArrayList<Activity> directlyPrecedingActivities = new ArrayList<>();
+                    directlyPrecedingActivities.add(a);
+                    Activity toAdd = new Activity("<nA2>",directlyPrecedingActivities,0.);
+                    toAllActivities.add(toAdd);
+
+                    ArrayList<Activity> inA = new ArrayList<>();
+                    ArrayList<Activity> outA = new ArrayList<>();
+                    inA.add(a);
+                    outA.add(toAdd);
+                    toAllEvents.add(new Event("<nE2>",inA, outA));
+
+                    toAdd.eventTo.add(a.eventTo.get(0));
+                    a.eventTo.remove(0);
+                    a.eventTo.add(toAdd.eventFrom.get(0));
+
+                    //remount old one
+                    a.eventTo.get(0).inActivites.remove(a);
+                    a.eventTo.get(0).inActivites.add(toAdd);
+                    System.out.println(" @ event "+e.name);
                 }
                 toEvents.add(a.eventTo.get(0));
             }
         }
+        allEvents.addAll(toAllEvents);
+        allActivities.addAll(toAllActivities);
     }
 }
