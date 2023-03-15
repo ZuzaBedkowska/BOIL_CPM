@@ -254,4 +254,11 @@ public class MainLogic {
         allEvents.addAll(toAllEvents);
         allActivities.addAll(toAllActivities);
     }
+
+    public ArrayList<Activity> getAllActivities(){
+        return allActivities;
+    }
+    public ArrayList<Event> getAllEvents(){
+        return allEvents;
+    }
 }
