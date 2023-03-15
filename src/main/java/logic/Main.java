@@ -9,8 +9,8 @@ public class Main {
             //stworzenie GUI
             //napisana metoda do stworzenia gui
             SwingUtilities.invokeLater(Main::createGUI);
-            MainLogic mainLogic = new MainLogic();
-            mainLogic.test();
+            //MainLogic mainLogic = new MainLogic();
+            //mainLogic.test();
 
         } catch (Exception e) {
             String message = "Something went wrong!\n";

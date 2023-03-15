@@ -1,5 +1,9 @@
 package ui;
 
+import logic.Activity;
+import logic.ActivityInput;
+import logic.MainLogic;
+
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
@@ -90,15 +94,27 @@ class DataFetcher extends AbstractTableModel {
 class ResultFetcher extends AbstractTableModel {
     ArrayList<Object[]> userData;
     private final String[] columnNames;
+    MainLogic mainLogic;
 
     public ResultFetcher() {
         columnNames = new String[]{"Czynność", "Czas", "ES", "EF", "LS", "LF", "Rezerwa", "Czynność krytyczna"};
         userData = new ArrayList<>();
+        mainLogic = new MainLogic();
     }
 
     public void setUserData (DataFetcher dataFetcher) {
-        for (int i = 0; i<dataFetcher.getRowCount(); ++i) {
-            Object[] dane = new Object[]{dataFetcher.getValueAt(i, 0), dataFetcher.getValueAt(i,2), "", "", "", "", "", ""};
+        ArrayList<ActivityInput> testingData = new ArrayList<>();
+        for (int i = 0; i < dataFetcher.getRowCount(); ++i) {
+            String poprzednicy = (String)dataFetcher.getValueAt(i, 1);
+            String nazwa = (String) dataFetcher.getValueAt(i, 0);
+            Double czas =  Double.parseDouble((String)dataFetcher.getValueAt(i, 2));
+            testingData.add(new ActivityInput(nazwa, poprzednicy, czas));
+        }
+        mainLogic.addActivityInput(testingData);
+        mainLogic.calc();
+        ArrayList<Activity> wynik = mainLogic.getAllActivities();
+        for (Activity activity : wynik) {
+            Object[] dane = new Object[]{activity.name, activity.time, activity.ES, activity.EF, activity.LS, activity.LF, activity.reserve, activity.isCritical};
             userData.add(dane);
         }
     }
