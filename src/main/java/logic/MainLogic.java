@@ -171,9 +171,9 @@ public class MainLogic {
             for (int j = i+1; j < allEvents.size(); j++) {
                 Event e2 = allEvents.get(j);
                 if (e1 == e2)
-                    break;
+                    continue;
                 if (e1.outActivites.size() != e2.outActivites.size())
-                    break;
+                    continue;
                 boolean eventIsRemovable = true;
                 for (Activity a : e1.outActivites)
                     if (!e2.outActivites.contains(a)) {
