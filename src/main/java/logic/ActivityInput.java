@@ -17,8 +17,8 @@ public class ActivityInput {
         this(name,directlyPrecedingActivities,Double.valueOf(time));
     }
     public ActivityInput(String name, String directlyPrecedingActivities, Double time) {
-        name = name.replaceAll(" ", ""); //remove all spaces
-        directlyPrecedingActivities = directlyPrecedingActivities.replaceAll(" ", ""); //remove all spaces
+        //name = name.replaceAll(" ", ""); //remove all spaces
+        //directlyPrecedingActivities = directlyPrecedingActivities.replaceAll(" ", ""); //remove all spaces
         this.name = name;
         if (directlyPrecedingActivities.equals("-"))
             //if list is empty (== "-")
