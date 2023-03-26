@@ -3,17 +3,28 @@ package ui;
 import logic.Activity;
 import logic.ActivityInput;
 import logic.MainLogic;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.data.gantt.GanttCategoryDataset;
+import org.jfree.data.gantt.Task;
+import org.jfree.data.gantt.TaskSeries;
+import org.jfree.data.gantt.TaskSeriesCollection;
+import org.jfree.data.time.SimpleTimePeriod;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import static java.util.Arrays.*;
+import static java.util.Arrays.asList;
 
 class DataFetcher extends AbstractTableModel {
     private final String[] columnNames;
@@ -162,6 +173,39 @@ class ResultFetcher extends AbstractTableModel {
     }
 }
 
+class GanttChartMaker extends JFrame{
+    ChartPanel panel;
+    public GanttChartMaker (String title, ResultFetcher resultFetcher) {
+        super(title);
+        GanttCategoryDataset dataset = getCategoryDataset(resultFetcher);
+        JFreeChart chart = ChartFactory.createGanttChart(
+                title, // Chart title
+                "Czynnosci", // Y-Axis Label
+                "Czas", // X-Axis Label
+                dataset);
+        CategoryPlot plot = chart.getCategoryPlot();
+        DateAxis axis = (DateAxis) plot.getRangeAxis();
+        axis.setDateFormatOverride(new SimpleDateFormat("S"));
+        panel = new ChartPanel(chart);
+        setContentPane(panel);
+    }
+    private GanttCategoryDataset getCategoryDataset(ResultFetcher results) {
+        TaskSeries najwczesniejsze=new TaskSeries("Czas najwcześniejszy");
+        TaskSeries najpozniejsze=new TaskSeries("Czas najpóźniejszy");
+        for (int i = 0; i < results.getRowCount(); ++i) {
+            najwczesniejsze.add(new Task((String) results.getValueAt(i, 0), new SimpleTimePeriod(0, 1)));
+            //tu trzeba zrobić żeby dobrze liczyło daty, bo nie chce dobrze - zamiast 0 i 1 trzeba wstawić ES i EF
+        }
+        TaskSeriesCollection dataset = new TaskSeriesCollection();
+        dataset.add(najwczesniejsze);dataset.add(najpozniejsze);
+        return dataset;
+    }
+
+    public ChartPanel getPanel() {
+        return panel;
+    }
+}
+
 public class MainUI {
     private JPanel rootPanel;
     private JComboBox<String> displayBox;
@@ -263,7 +307,8 @@ public class MainUI {
                 panel.add(scroll);
             }
             if ("Diagram Gantta".equals(resultType)) {
-                //TUTAJ GANTT
+                GanttChartMaker ganttChartMaker = new GanttChartMaker("Harmonogram Gantta", resultFetcher);
+                panel.add(ganttChartMaker.getPanel());
             }
             if ("Graf CPM".equals(resultType)) {
                 //TUTAJ GRAF CPM
