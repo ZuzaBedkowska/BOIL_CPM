@@ -141,6 +141,7 @@ class ResultFetcher extends AbstractTableModel {
         columnNames = new String[]{ "Czynność", "Czas", "ES", "EF", "LS", "LF", "Rezerwa", "Czynność krytyczna" };
         userData = new ArrayList<>();
         mainLogic = new MainLogic();
+        mainLogic.test();
     }
 
     public void setUserData(DataFetcher dataFetcher) {

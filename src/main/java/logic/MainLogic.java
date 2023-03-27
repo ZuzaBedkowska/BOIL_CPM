@@ -96,19 +96,32 @@ public class MainLogic {
         testingData.add(new ActivityInput("G","E",12.));
         testingData.add(new ActivityInput("H","F, G",8.));*/
 
-        testingData.add(new ActivityInput("A","-",5));
+        /*testingData.add(new ActivityInput("A","-",5));
         testingData.add(new ActivityInput("B","-",7));
         testingData.add(new ActivityInput("C","A",6));
         testingData.add(new ActivityInput("D","A",8));
         testingData.add(new ActivityInput("E","B",3));
         testingData.add(new ActivityInput("F","C",4));
         testingData.add(new ActivityInput("G","C",2));
-        testingData.add(new ActivityInput("H","E,D,F",5));
+        testingData.add(new ActivityInput("H","E,D,F",5));*/
+
+        testingData.add(new ActivityInput("A","-",6));
+        testingData.add(new ActivityInput("B","-",10));
+        testingData.add(new ActivityInput("C","A",6));
+        testingData.add(new ActivityInput("D","A",12));
+        testingData.add(new ActivityInput("E","B,C",5));
+        testingData.add(new ActivityInput("F","B,C",8));
+        testingData.add(new ActivityInput("G","E",8));
+        testingData.add(new ActivityInput("H","D,F",7));
+        testingData.add(new ActivityInput("I","D,F",8));
+        testingData.add(new ActivityInput("J","H,G",6));
+        testingData.add(new ActivityInput("K","I,J",7));
+
         for (ActivityInput a : testingData)
             addActivityInput(a);
 
-        if (calc() != 0)
-            System.err.println("there was some error in calc()!");
+        //if (calc() != 0)
+        //    System.err.println("there was some error in calc()!");
     }
     public Integer calc(){
         basicDumbAlgorithm();
