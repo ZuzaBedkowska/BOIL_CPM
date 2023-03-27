@@ -193,7 +193,12 @@ class GanttChartMaker extends JFrame{
         TaskSeries najwczesniejsze=new TaskSeries("Czas najwcześniejszy");
         TaskSeries najpozniejsze=new TaskSeries("Czas najpóźniejszy");
         for (int i = 0; i < results.getRowCount(); ++i) {
-            najwczesniejsze.add(new Task((String) results.getValueAt(i, 0), new SimpleTimePeriod(0, 1)));
+            long ES = ((Double)results.getValueAt(i, 2)).longValue();
+            long EF = ((Double)results.getValueAt(i, 3)).longValue();
+            long LS = ((Double)results.getValueAt(i, 4)).longValue();
+            long LF = ((Double)results.getValueAt(i, 5)).longValue();
+            najwczesniejsze.add(new Task((String) results.getValueAt(i, 0), new SimpleTimePeriod(ES, EF)));
+            najpozniejsze.add(new Task((String) results.getValueAt(i, 0), new SimpleTimePeriod(LS, LF)));
             //tu trzeba zrobić żeby dobrze liczyło daty, bo nie chce dobrze - zamiast 0 i 1 trzeba wstawić ES i EF
         }
         TaskSeriesCollection dataset = new TaskSeriesCollection();
