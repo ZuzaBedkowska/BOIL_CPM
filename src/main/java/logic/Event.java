@@ -42,4 +42,8 @@ public class Event {
     public Double getReserve(){
         return this.getEF() - this.getES();
     }
+    public void resetCounters(){
+        eventCounter=0;
+        apparentCounter=0;
+    }
 }

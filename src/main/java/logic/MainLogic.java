@@ -124,6 +124,8 @@ public class MainLogic {
         //    System.err.println("there was some error in calc()!");
     }
     public Integer calc(){
+        resetCounters();
+
         basicDumbAlgorithm();
         simplifySameOuts();
         apparentActivityCase1();
@@ -273,5 +275,9 @@ public class MainLogic {
     }
     public ArrayList<Event> getAllEvents(){
         return allEvents;
+    }
+    private void resetCounters(){
+        new Event("e",new ArrayList<Activity>(),new ArrayList<Activity>()).resetCounters();
+        new Activity("a",new ArrayList<Activity>(),0.).resetCounters();
     }
 }

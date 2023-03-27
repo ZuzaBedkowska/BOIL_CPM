@@ -54,4 +54,7 @@ public class Activity {
     public Double getEF() {return EF;}
     public Double getLS() {return LS;}
     public Double getLF() {return LF;}
+    public void resetCounters(){
+        apparentCounter=0;
+    }
 }
