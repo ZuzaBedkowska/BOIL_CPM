@@ -1,5 +1,11 @@
 package ui;
 
+import guru.nidi.graphviz.attribute.Rank;
+import guru.nidi.graphviz.attribute.Records;
+import guru.nidi.graphviz.attribute.Style;
+import guru.nidi.graphviz.engine.Format;
+import guru.nidi.graphviz.engine.Graphviz;
+import guru.nidi.graphviz.model.MutableGraph;
 import logic.Activity;
 import logic.ActivityInput;
 import logic.MainLogic;
@@ -14,16 +20,23 @@ import org.jfree.data.gantt.TaskSeries;
 import org.jfree.data.gantt.TaskSeriesCollection;
 import org.jfree.data.time.SimpleTimePeriod;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static guru.nidi.graphviz.attribute.Records.rec;
+import static guru.nidi.graphviz.attribute.Records.turn;
+import static guru.nidi.graphviz.model.Factory.*;
 import static java.util.Arrays.asList;
 
 class DataFetcher extends AbstractTableModel {
@@ -120,9 +133,9 @@ class DataFetcher extends AbstractTableModel {
 }
 
 class ResultFetcher extends AbstractTableModel {
-    ArrayList<Object[]> userData; //TU SA WYNIKI DO TABELKI
+    private final ArrayList<Object[]> userData; //TU SA WYNIKI DO TABELKI
     private final String[] columnNames;
-    MainLogic mainLogic; //TU SA DANE
+    private final MainLogic mainLogic; //TU SA DANE
 
     public ResultFetcher() {
         columnNames = new String[]{ "Czynność", "Czas", "ES", "EF", "LS", "LF", "Rezerwa", "Czynność krytyczna" };
@@ -171,6 +184,10 @@ class ResultFetcher extends AbstractTableModel {
     public String getColumnName(int col) {
         return columnNames[col];
     }
+
+    public MainLogic getMainLogic() {
+        return mainLogic;
+    }
 }
 
 class GanttChartMaker extends JFrame{
@@ -192,16 +209,62 @@ class GanttChartMaker extends JFrame{
     private GanttCategoryDataset getCategoryDataset(ResultFetcher results) {
         TaskSeries najwczesniejsze=new TaskSeries("Czas najwcześniejszy");
         TaskSeries najpozniejsze=new TaskSeries("Czas najpóźniejszy");
+        TaskSeries krytyczne=new TaskSeries("Czynnosci krytyczne");
         for (int i = 0; i < results.getRowCount(); ++i) {
-            najwczesniejsze.add(new Task((String) results.getValueAt(i, 0), new SimpleTimePeriod(0, 1)));
-            //tu trzeba zrobić żeby dobrze liczyło daty, bo nie chce dobrze - zamiast 0 i 1 trzeba wstawić ES i EF
+            long ES = ((Double)results.getValueAt(i, 2)).longValue();
+            long EF = ((Double)results.getValueAt(i, 3)).longValue();
+            long LS = ((Double)results.getValueAt(i, 4)).longValue();
+            long LF = ((Double)results.getValueAt(i, 5)).longValue();
+            if (ES-EF==0) {
+                continue;
+            }
+            najwczesniejsze.add(new Task((String) results.getValueAt(i, 0), new SimpleTimePeriod(ES, EF)));
+            najpozniejsze.add(new Task((String) results.getValueAt(i, 0), new SimpleTimePeriod(LS, LF)));
+            if ((boolean)results.getValueAt(i, 7)) {
+                krytyczne.add(new Task((String) results.getValueAt(i, 0), new SimpleTimePeriod(ES, EF)));
+            }
         }
         TaskSeriesCollection dataset = new TaskSeriesCollection();
-        dataset.add(najwczesniejsze);dataset.add(najpozniejsze);
+        dataset.add(najwczesniejsze);
+        dataset.add(najpozniejsze);
+        dataset.add(krytyczne);
         return dataset;
     }
 
     public ChartPanel getPanel() {
+        return panel;
+    }
+}
+
+class GraphMaker extends JPanel{
+    JPanel panel;
+    MutableGraph graph;
+    public GraphMaker (ResultFetcher resultFetcher) throws IOException {
+        panel = new JPanel();
+        graph = mutGraph("Graf CPM").setDirected(true).graphAttrs().add(Rank.dir(Rank.RankDir.LEFT_TO_RIGHT));
+        calculateGraph(resultFetcher);
+        Graphviz.fromGraph(graph).height(300).render(Format.PNG).toFile(new File("example/ex1.png"));
+        BufferedImage wPic = ImageIO.read(new File("example/ex1.png"));
+        JLabel wIcon = new JLabel(new ImageIcon(wPic));
+        panel.add(wIcon);
+    }
+
+    public void calculateGraph(ResultFetcher resultFetcher) {
+        //links
+        for (Activity i : resultFetcher.getMainLogic().getAllActivities()) {
+            if (i.isCritical && i.ES- i.EF==0) {
+                graph.add(mutNode(i.eventFrom.get(0).name).add(guru.nidi.graphviz.attribute.Color.RED, Records.of(rec(i.eventFrom.get(0).name),rec("ES = "+i.ES.toString()), rec("LS = "+i.LS.toString()), rec("L = "+i.reserve.toString()))).addLink(to(mutNode(i.eventTo.get(0).name).add(guru.nidi.graphviz.attribute.Color.RED, Records.of(rec(i.eventTo.get(0).name),rec("ES = "+i.EF.toString()), rec("LS = "+i.LF.toString()), rec("L = "+i.reserve.toString())))).with(Style.DASHED,guru.nidi.graphviz.attribute.Color.RED, guru.nidi.graphviz.attribute.Label.lines(i.name, i.time.toString()))));
+            } else if (i.isCritical) {
+                graph.add(mutNode(i.eventFrom.get(0).name).add(guru.nidi.graphviz.attribute.Color.RED, Records.of(rec(i.eventFrom.get(0).name),rec("ES = "+i.ES.toString()), rec("LS = "+i.LS.toString()), rec("L = "+i.reserve.toString()))).addLink(to(mutNode(i.eventTo.get(0).name).add(guru.nidi.graphviz.attribute.Color.RED, Records.of(rec(i.eventTo.get(0).name),rec("ES = "+i.EF.toString()), rec("LS = "+i.LF.toString()), rec("L = "+i.reserve.toString())))).with(guru.nidi.graphviz.attribute.Color.RED, guru.nidi.graphviz.attribute.Label.lines(i.name, i.time.toString()))));
+            } else if (i.ES-i.EF == 0) {
+                graph.add(mutNode(i.eventFrom.get(0).name).add(Records.of(rec(i.eventFrom.get(0).name),rec("ES = "+i.ES.toString()), rec("LS = "+i.LS.toString()), rec("L = "+i.reserve.toString()))).addLink(to(mutNode(i.eventTo.get(0).name).add(Records.of(rec(i.eventTo.get(0).name),rec("ES = "+i.EF.toString()), rec("LS = "+i.LF.toString()), rec("L = "+i.reserve.toString())))).with(Style.DASHED, guru.nidi.graphviz.attribute.Label.lines(i.name, i.time.toString()))));
+            }
+            else {
+                graph.add(mutNode(i.eventFrom.get(0).name).add(Records.of(rec(i.eventFrom.get(0).name),rec("ES = "+i.ES.toString()), rec("LS = "+i.LS.toString()), rec("L = "+i.reserve.toString()))).addLink(to(mutNode(i.eventTo.get(0).name).add(Records.of(rec(i.eventTo.get(0).name),rec("ES = "+i.EF.toString()), rec("LS = "+i.LF.toString()), rec("L = "+i.reserve.toString())))).with(guru.nidi.graphviz.attribute.Label.lines(i.name, i.time.toString()))));
+            }
+        }
+    }
+    public JPanel getPanel() {
         return panel;
     }
 }
@@ -215,7 +278,6 @@ public class MainUI {
     private JButton editButton;
     private JButton removeButton;
     private final DataFetcher dataFetcher;
-    private ResultFetcher resultFetcher;
 
     public MainUI() {
         editButton.setEnabled(false);
@@ -291,6 +353,8 @@ public class MainUI {
     }
     public void displayResult(String resultType) {
         try {
+            ResultFetcher resultFetcher = new ResultFetcher();
+            resultFetcher.setUserData(dataFetcher);
             JPanel panel = new JPanel(new GridLayout(0, 1));
             if ("Tabela".equals(resultType)) {
                 JTable resultTable = new JTable();
@@ -311,7 +375,8 @@ public class MainUI {
                 panel.add(ganttChartMaker.getPanel());
             }
             if ("Graf CPM".equals(resultType)) {
-                //TUTAJ GRAF CPM
+                GraphMaker graphMaker = new GraphMaker(resultFetcher);
+                panel.add(graphMaker.getPanel());
             }
             //to wyswietla okienko z wynikiem
             //jak chcesz swoje okienko do grafu/harmonogramu to przeloz te linijke do ifa z tabela
@@ -332,8 +397,6 @@ public class MainUI {
     }
     public void createDisplayButton(){
         displayButton.addActionListener(e->{
-            resultFetcher = new ResultFetcher();
-            resultFetcher.setUserData(dataFetcher);
             displayResult((String) displayBox.getSelectedItem());
         });
     }
