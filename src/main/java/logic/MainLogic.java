@@ -218,25 +218,43 @@ public class MainLogic {
             a.eventTo.removeAll(toRemove);
         }
     }
+    private boolean checkIfAccessible(Event e1, Event e2){
+        for(Activity a: e1.outActivites){
+            if (a.eventTo.get(0) == e2)
+                return true;
+            return checkIfAccessible(a.eventTo.get(0), e2);
+        }
+        return false;
+    }
     private void apparentActivityCase1(){
         ArrayList<Activity> toAllActivities = new ArrayList<>();
-        for (Activity a: allActivities)
-            if (a.eventFrom.size() >= 2) {
-                //add new apparent activity
-                ArrayList<Activity> directlyPrecedingActivities = new ArrayList<>();
-                directlyPrecedingActivities.addAll(a.directlyPrecedingActivities);
-                Activity toAdd = new Activity(a.getApparentName(),directlyPrecedingActivities,0.);
-                toAllActivities.add(toAdd);
-                //add EventFrom and EventTo to newly created apparent activity
-                toAdd.eventFrom.add(a.eventFrom.get(1));
-                toAdd.eventTo.add(a.eventFrom.get(0));
-                //add newly created activity to events
-                a.eventFrom.get(1).outActivites.add(toAdd);
-                a.eventFrom.get(0).inActivites.add(toAdd);
-                //delete 2nd mount, fix old activity
-                a.eventFrom.get(1).outActivites.remove(a);
-                a.eventFrom.remove(1);
+        for (Activity a: allActivities) {
+            int k = a.eventFrom.size();
+            if (k >=2){
+                for (int i=0;i<k;i++){
+                    for (int j=0;j<k;j++) {
+                        if (i==j) continue; //don't replace yourself lol
+                        if (checkIfAccessible(a.eventFrom.get(i),a.eventFrom.get(j)))
+                            continue;
+                        //add new apparent activity
+                        ArrayList<Activity> directlyPrecedingActivities = new ArrayList<>();
+                        directlyPrecedingActivities.addAll(a.directlyPrecedingActivities);
+                        Activity toAdd = new Activity(a.getApparentName(), directlyPrecedingActivities, 0.);
+                        toAllActivities.add(toAdd);
+                        //add EventFrom and EventTo to newly created apparent activity
+                        toAdd.eventFrom.add(a.eventFrom.get(j));
+                        toAdd.eventTo.add(a.eventFrom.get(i));
+                        //add newly created activity to events
+                        a.eventFrom.get(j).outActivites.add(toAdd);
+                        a.eventFrom.get(i).inActivites.add(toAdd);
+                        //delete 2nd mount, fix old activity
+                        a.eventFrom.get(j).outActivites.remove(a);
+                        a.eventFrom.remove(j);
+                        i=j=k; //same behaviour as 2 breaks
+                    }
+                }
             }
+        }
         allActivities.addAll(toAllActivities);
     }
     private void apparentActivityCase2(){
