@@ -133,6 +133,8 @@ public class MainLogic {
         CriticalPath criticalPath = new CriticalPath(allActivities,allEvents);
         criticalPath.calc();
 
+        fixEventsNames();
+
         testPrintEvents();
         testPrintActivities();
         validateGraphEquivalence();
@@ -279,5 +281,12 @@ public class MainLogic {
     private void resetCounters(){
         new Event("e",new ArrayList<Activity>(),new ArrayList<Activity>()).resetCounters();
         new Activity("a",new ArrayList<Activity>(),0.).resetCounters();
+    }
+
+    private void fixEventsNames(){
+        int nameCounter=0;
+        for (Event e: allEvents){
+            e.name = Integer.toString(nameCounter++);
+        }
     }
 }
