@@ -192,17 +192,25 @@ class GanttChartMaker extends JFrame{
     private GanttCategoryDataset getCategoryDataset(ResultFetcher results) {
         TaskSeries najwczesniejsze=new TaskSeries("Czas najwcześniejszy");
         TaskSeries najpozniejsze=new TaskSeries("Czas najpóźniejszy");
+        TaskSeries krytyczne=new TaskSeries("Czynnosci krytyczne");
         for (int i = 0; i < results.getRowCount(); ++i) {
             long ES = ((Double)results.getValueAt(i, 2)).longValue();
             long EF = ((Double)results.getValueAt(i, 3)).longValue();
             long LS = ((Double)results.getValueAt(i, 4)).longValue();
             long LF = ((Double)results.getValueAt(i, 5)).longValue();
+            if (ES-EF==0) {
+                continue;
+            }
             najwczesniejsze.add(new Task((String) results.getValueAt(i, 0), new SimpleTimePeriod(ES, EF)));
             najpozniejsze.add(new Task((String) results.getValueAt(i, 0), new SimpleTimePeriod(LS, LF)));
-            //tu trzeba zrobić żeby dobrze liczyło daty, bo nie chce dobrze - zamiast 0 i 1 trzeba wstawić ES i EF
+            if ((boolean)results.getValueAt(i, 7)) {
+                krytyczne.add(new Task((String) results.getValueAt(i, 0), new SimpleTimePeriod(ES, EF)));
+            }
         }
         TaskSeriesCollection dataset = new TaskSeriesCollection();
-        dataset.add(najwczesniejsze);dataset.add(najpozniejsze);
+        dataset.add(najwczesniejsze);
+        dataset.add(najpozniejsze);
+        dataset.add(krytyczne);
         return dataset;
     }
 
@@ -210,6 +218,22 @@ class GanttChartMaker extends JFrame{
         return panel;
     }
 }
+
+/*class GraphMaker {
+
+    Graph graph;
+    JPanel panel;
+    public GraphMaker (ResultFetcher resultFetcher) {
+        Graph graph = new MultiGraph("Graf CPM");
+        panel = new JPanel();
+        calculateGraph(resultFetcher);
+        Viewer viewer = graph.display();
+    }
+
+    public void calculateGraph(ResultFetcher resultFetcher) {
+
+    }
+}*/
 
 public class MainUI {
     private JPanel rootPanel;
