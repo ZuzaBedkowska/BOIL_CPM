@@ -8,7 +8,6 @@ public class Main {
         try{
             //stworzenie GUI
             //napisana metoda do stworzenia gui
-            System.setProperty("org.graphstream.ui", "swing");
             SwingUtilities.invokeLater(Main::createGUI);
             //MainLogic mainLogic = new MainLogic();
             //mainLogic.test();
