@@ -141,7 +141,7 @@ class ResultFetcher extends AbstractTableModel {
         columnNames = new String[]{ "Czynność", "Czas", "ES", "EF", "LS", "LF", "Rezerwa", "Czynność krytyczna" };
         userData = new ArrayList<>();
         mainLogic = new MainLogic();
-        mainLogic.test();
+        //mainLogic.test();
     }
 
     public void setUserData(DataFetcher dataFetcher) {
@@ -153,7 +153,18 @@ class ResultFetcher extends AbstractTableModel {
             testingData.add(new ActivityInput(nazwa, poprzednicy, czas));
         }
         mainLogic.addActivityInput(testingData);
-        mainLogic.calc();
+        try {
+            mainLogic.calc();
+        }
+        catch (Exception e){
+            String message = "Invalid data\n";
+            if (e.getMessage() != null) {
+                message += e.getMessage();
+                message += "\n";
+            }
+            message += "Please try again!\n";
+            JOptionPane.showMessageDialog(new JFrame(), message);
+        }
         ArrayList<Activity> wynik = mainLogic.getAllActivities();
         for (Activity activity : wynik) {
             Object[] dane = new Object[]{ activity.name, activity.time, activity.ES, activity.EF, activity.LS, activity.LF, activity.reserve, activity.isCritical };

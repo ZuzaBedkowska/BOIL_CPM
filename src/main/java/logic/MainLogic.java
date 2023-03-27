@@ -31,31 +31,36 @@ public class MainLogic {
 
         System.out.println();
     }
-    private void validateGraphEquivalence(){
-        System.out.println(" @ Graph validation");
-        System.out.print(" @ Activities: ");
-        boolean activitiesOk = true;
-        for (Activity a: allActivities)
-            if (!a.eventTo.get(0).inActivites.contains(a) || !a.eventFrom.get(0).outActivites.contains(a)){
-                activitiesOk = false;
-                System.out.print("\n @ failed at activity: "+a.name);
+    private void validateGraphEquivalence() throws Exception {
+        try {
+            System.out.println(" @ Graph validation");
+            System.out.print(" @ Activities: ");
+            boolean activitiesOk = true;
+            for (Activity a : allActivities)
+                if (!a.eventTo.get(0).inActivites.contains(a) || !a.eventFrom.get(0).outActivites.contains(a)) {
+                    activitiesOk = false;
+                    System.out.print("\n @ failed at activity: " + a.name);
+                }
+            System.out.println(activitiesOk ? " OK" : "");
+            System.out.print(" @ Events: ");
+            boolean eventsOk = true;
+            for (Event e : allEvents) {
+                for (Activity outs : e.outActivites)
+                    if (!outs.eventFrom.contains(e)) {
+                        eventsOk = false;
+                        System.out.print("\n @ failed at event: " + e.name);
+                    }
+                for (Activity ins : e.inActivites)
+                    if (!ins.eventTo.contains(e)) {
+                        eventsOk = false;
+                        System.out.print("\n @ failed at event: " + e.name);
+                    }
             }
-        System.out.println(activitiesOk?" OK":"");
-        System.out.print(" @ Events: ");
-        boolean eventsOk = true;
-        for (Event e: allEvents) {
-            for (Activity outs: e.outActivites)
-                if (!outs.eventFrom.contains(e)){
-                    eventsOk = false;
-                    System.out.print("\n @ failed at event: "+e.name);
-                }
-            for (Activity ins: e.inActivites)
-                if (!ins.eventTo.contains(e)){
-                    eventsOk = false;
-                    System.out.print("\n @ failed at event: "+e.name);
-                }
+            System.out.println(eventsOk ? " OK" : "");
         }
-        System.out.println(eventsOk?" OK":"");
+        catch (Exception e){
+            throw new Exception("the given graph is invalid");//return 0x0;
+        }
     }
     public boolean resetEverything(){
         try {
@@ -119,11 +124,10 @@ public class MainLogic {
 
         for (ActivityInput a : testingData)
             addActivityInput(a);
-
         //if (calc() != 0)
         //    System.err.println("there was some error in calc()!");
     }
-    public Integer calc(){
+    public Integer calc() throws Exception{
         resetCounters();
 
         basicDumbAlgorithm();
