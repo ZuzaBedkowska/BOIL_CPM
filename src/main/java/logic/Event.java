@@ -20,4 +20,30 @@ public class Event {
     public String getApparentName(){
         return ("e"+Integer.toString(apparentCounter++));
     }
+    public Double getES(){
+        Double maxEF = 0.;
+        for (Activity a: inActivites){
+            maxEF = Math.max(maxEF,a.EF);
+        }
+        return maxEF;
+    }
+    public Double getEF(){
+        Double minLS;
+        if (outActivites.size()==0) //last one
+            minLS = this.getES();
+        else
+            minLS = outActivites.get(0).LS;
+
+        for (Activity a: outActivites){
+            minLS = Math.min(minLS,a.LS);
+        }
+        return minLS;
+    }
+    public Double getReserve(){
+        return this.getEF() - this.getES();
+    }
+    public void resetCounters(){
+        eventCounter=0;
+        apparentCounter=0;
+    }
 }

@@ -141,6 +141,7 @@ class ResultFetcher extends AbstractTableModel {
         columnNames = new String[]{ "Czynność", "Czas", "ES", "EF", "LS", "LF", "Rezerwa", "Czynność krytyczna" };
         userData = new ArrayList<>();
         mainLogic = new MainLogic();
+        //mainLogic.test();
     }
 
     public void setUserData(DataFetcher dataFetcher) {
@@ -152,7 +153,18 @@ class ResultFetcher extends AbstractTableModel {
             testingData.add(new ActivityInput(nazwa, poprzednicy, czas));
         }
         mainLogic.addActivityInput(testingData);
-        mainLogic.calc();
+        try {
+            mainLogic.calc();
+        }
+        catch (Exception e){
+            String message = "Invalid data\n";
+            if (e.getMessage() != null) {
+                message += e.getMessage();
+                message += "\n";
+            }
+            message += "Please try again!\n";
+            JOptionPane.showMessageDialog(new JFrame(), message);
+        }
         ArrayList<Activity> wynik = mainLogic.getAllActivities();
         for (Activity activity : wynik) {
             Object[] dane = new Object[]{ activity.name, activity.time, activity.ES, activity.EF, activity.LS, activity.LF, activity.reserve, activity.isCritical };
@@ -253,14 +265,14 @@ class GraphMaker extends JPanel{
         //links
         for (Activity i : resultFetcher.getMainLogic().getAllActivities()) {
             if (i.isCritical && i.ES- i.EF==0) {
-                graph.add(mutNode(i.eventFrom.get(0).name).add(guru.nidi.graphviz.attribute.Color.RED, Records.of(rec(i.eventFrom.get(0).name),rec("ES = "+i.ES.toString()), rec("LS = "+i.LS.toString()), rec("L = "+i.reserve.toString()))).addLink(to(mutNode(i.eventTo.get(0).name).add(guru.nidi.graphviz.attribute.Color.RED, Records.of(rec(i.eventTo.get(0).name),rec("ES = "+i.EF.toString()), rec("LS = "+i.LF.toString()), rec("L = "+i.reserve.toString())))).with(Style.DASHED,guru.nidi.graphviz.attribute.Color.RED, guru.nidi.graphviz.attribute.Label.lines(i.name, i.time.toString()))));
+                graph.add(mutNode(i.eventFrom.get(0).name).add(guru.nidi.graphviz.attribute.Color.RED, Records.of(rec(i.eventFrom.get(0).name),rec("ES = "+i.eventFrom.get(0).getES().toString()), rec("LS = "+i.eventFrom.get(0).getEF().toString()), rec("L = "+i.eventFrom.get(0).getReserve().toString()))).addLink(to(mutNode(i.eventTo.get(0).name).add(guru.nidi.graphviz.attribute.Color.RED, Records.of(rec(i.eventTo.get(0).name),rec("ES = "+i.eventTo.get(0).getES().toString()), rec("EF = "+i.eventTo.get(0).getEF().toString()), rec("L = "+i.eventTo.get(0).getReserve().toString())))).with(Style.DASHED,guru.nidi.graphviz.attribute.Color.RED, guru.nidi.graphviz.attribute.Label.lines(i.name, i.time.toString()))));
             } else if (i.isCritical) {
-                graph.add(mutNode(i.eventFrom.get(0).name).add(guru.nidi.graphviz.attribute.Color.RED, Records.of(rec(i.eventFrom.get(0).name),rec("ES = "+i.ES.toString()), rec("LS = "+i.LS.toString()), rec("L = "+i.reserve.toString()))).addLink(to(mutNode(i.eventTo.get(0).name).add(guru.nidi.graphviz.attribute.Color.RED, Records.of(rec(i.eventTo.get(0).name),rec("ES = "+i.EF.toString()), rec("LS = "+i.LF.toString()), rec("L = "+i.reserve.toString())))).with(guru.nidi.graphviz.attribute.Color.RED, guru.nidi.graphviz.attribute.Label.lines(i.name, i.time.toString()))));
+                graph.add(mutNode(i.eventFrom.get(0).name).add(guru.nidi.graphviz.attribute.Color.RED, Records.of(rec(i.eventFrom.get(0).name),rec("ES = "+i.eventFrom.get(0).getES().toString()), rec("EF = "+i.eventFrom.get(0).getEF().toString()), rec("L = "+i.eventFrom.get(0).getReserve().toString()))).addLink(to(mutNode(i.eventTo.get(0).name).add(guru.nidi.graphviz.attribute.Color.RED, Records.of(rec(i.eventTo.get(0).name),rec("ES = "+i.eventTo.get(0).getES().toString()), rec("EF = "+i.eventTo.get(0).getEF().toString()), rec("L = "+i.eventTo.get(0).getReserve().toString())))).with(guru.nidi.graphviz.attribute.Color.RED, guru.nidi.graphviz.attribute.Label.lines(i.name, i.time.toString()))));
             } else if (i.ES-i.EF == 0) {
-                graph.add(mutNode(i.eventFrom.get(0).name).add(Records.of(rec(i.eventFrom.get(0).name),rec("ES = "+i.ES.toString()), rec("LS = "+i.LS.toString()), rec("L = "+i.reserve.toString()))).addLink(to(mutNode(i.eventTo.get(0).name).add(Records.of(rec(i.eventTo.get(0).name),rec("ES = "+i.EF.toString()), rec("LS = "+i.LF.toString()), rec("L = "+i.reserve.toString())))).with(Style.DASHED, guru.nidi.graphviz.attribute.Label.lines(i.name, i.time.toString()))));
+                graph.add(mutNode(i.eventFrom.get(0).name).add(Records.of(rec(i.eventFrom.get(0).name),rec("ES = "+i.eventTo.get(0).getES().toString()), rec("EF = "+i.eventTo.get(0).getEF().toString()), rec("L = "+i.eventTo.get(0).getReserve().toString()))).addLink(to(mutNode(i.eventTo.get(0).name).add(Records.of(rec(i.eventTo.get(0).name),rec("ES = "+i.eventTo.get(0).getES().toString()), rec("EF = "+i.eventTo.get(0).getEF().toString()), rec("L = "+i.eventTo.get(0).getReserve().toString())))).with(Style.DASHED, guru.nidi.graphviz.attribute.Label.lines(i.name, i.time.toString()))));
             }
             else {
-                graph.add(mutNode(i.eventFrom.get(0).name).add(Records.of(rec(i.eventFrom.get(0).name),rec("ES = "+i.ES.toString()), rec("LS = "+i.LS.toString()), rec("L = "+i.reserve.toString()))).addLink(to(mutNode(i.eventTo.get(0).name).add(Records.of(rec(i.eventTo.get(0).name),rec("ES = "+i.EF.toString()), rec("LS = "+i.LF.toString()), rec("L = "+i.reserve.toString())))).with(guru.nidi.graphviz.attribute.Label.lines(i.name, i.time.toString()))));
+                graph.add(mutNode(i.eventFrom.get(0).name).add(Records.of(rec(i.eventFrom.get(0).name),rec("ES = "+i.eventTo.get(0).getES().toString()), rec("EF = "+i.eventTo.get(0).getEF().toString()), rec("L = "+i.eventTo.get(0).getReserve().toString()))).addLink(to(mutNode(i.eventTo.get(0).name).add(Records.of(rec(i.eventTo.get(0).name),rec("ES = "+i.eventTo.get(0).getES().toString()), rec("EF = "+i.eventTo.get(0).getEF().toString()), rec("L = "+i.eventTo.get(0).getReserve().toString())))).with(guru.nidi.graphviz.attribute.Label.lines(i.name, i.time.toString()))));
             }
         }
     }
