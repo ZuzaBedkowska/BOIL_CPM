@@ -239,7 +239,7 @@ class GanttChartMaker extends JFrame{
         TaskSeriesCollection dataset = new TaskSeriesCollection();
         dataset.add(najwczesniejsze);
         dataset.add(najpozniejsze);
-        dataset.add(krytyczne);
+        //dataset.add(krytyczne);
         return dataset;
     }
 
