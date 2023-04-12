@@ -6,6 +6,7 @@ import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
+import guru.nidi.graphviz.model.MutableNode;
 import logic.Activity;
 import logic.ActivityInput;
 import logic.MainLogic;
@@ -251,14 +252,32 @@ class GanttChartMaker extends JFrame{
 class GraphMaker extends JPanel{
     JPanel panel;
     MutableGraph graph;
+    MutableGraph legendGraph;
     public GraphMaker (ResultFetcher resultFetcher) throws IOException {
-        panel = new JPanel();
+        panel = new JPanel(new GridLayout(0, 1));
         graph = mutGraph("Graf CPM").setDirected(true).graphAttrs().add(Rank.dir(Rank.RankDir.LEFT_TO_RIGHT));
+        legendGraph = mutGraph("Legenda").setDirected(true).graphAttrs().add(Rank.dir(Rank.RankDir.LEFT_TO_RIGHT));
         calculateGraph(resultFetcher);
-        Graphviz.fromGraph(graph).height(300).render(Format.PNG).toFile(new File("example/ex1.png"));
+        makeLegend();
+        Graphviz.fromGraph(legendGraph).width(600).render(Format.PNG).toFile(new File("example/legend.png"));
+        Graphviz.fromGraph(graph).width(600).render(Format.PNG).toFile(new File("example/ex1.png"));
         BufferedImage wPic = ImageIO.read(new File("example/ex1.png"));
+        BufferedImage lPic = ImageIO.read(new File("example/legend.png"));
         JLabel wIcon = new JLabel(new ImageIcon(wPic));
+        JLabel lIcon = new JLabel(new ImageIcon(lPic));
         panel.add(wIcon);
+        panel.add(lIcon);
+    }
+
+    public void makeLegend() {
+        //legend
+        MutableNode legendNode1 = mutNode("L1").add(guru.nidi.graphviz.attribute.Color.WHITE,Records.of(rec("11","Opis wierzchołka:"), rec("12","ES = najwcześniejszy czas rozpoczęcia"), rec("13","LS = najpóźniejszy czas rozpoczęcia"), rec("14","L = zapas czasu (LS - ES)")));
+        legendGraph.add(legendNode1);
+        MutableNode legendNode2 = mutNode("").add(guru.nidi.graphviz.attribute.Color.WHITE,Records.of(rec("1",""), rec("2",""), rec("3",""), rec("4","")));
+        legendGraph.add(legendNode1.addLink(between(port("12"), legendNode2.port("2")).with(guru.nidi.graphviz.attribute.Color.WHITE, guru.nidi.graphviz.attribute.Label.lines("Opis krawędzi:"))));
+        legendGraph.add(legendNode1.addLink(between(port("13"), legendNode2.port("3")).with(guru.nidi.graphviz.attribute.Color.RED, guru.nidi.graphviz.attribute.Label.lines("Czynność krytyczna"))));
+        legendGraph.add(legendNode1.addLink(between(port("14"), legendNode2.port("4")).with(Style.DASHED, guru.nidi.graphviz.attribute.Label.lines("Czynność pozorna"))));
+
     }
 
     public void calculateGraph(ResultFetcher resultFetcher) {
